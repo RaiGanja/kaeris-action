@@ -1,3 +1,5 @@
+<img src="https://kaeris.dev/icon-512.png" alt="KAERIS" width="72" align="left" style="margin-right:16px" />
+
 # KAERIS i18n Translate — GitHub Action
 
 Translate new or changed i18n keys with AI, or gate CI on translation completeness — **46 languages, incremental, placeholder-safe.**
