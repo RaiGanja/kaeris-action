@@ -77,7 +77,7 @@ runs:
       shell: bash
       # Pin to the version that ships the `check --json --ci` firewall + incremental flags this
       # action relies on, so a user never gets an older CLI that lacks them (fails the run).
-      run: pip install "kaeris>=0.2.3"
+      run: pip install "kaeris>=0.2.5"
 
     - name: Run KAERIS (${{ inputs.mode }})
       id: run
