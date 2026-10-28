@@ -9,7 +9,7 @@ Two modes:
 - **`translate`** — translates the keys that are new or changed since the last run and writes the locale files, then emits a `changed` flag and a Markdown `summary` so you can open a PR only when something actually changed.
 - **`check`** — a static, offline **i18n firewall**: no API call, fails the build when a locale is missing keys or a translation broke a placeholder. Free, no key required.
 
-Works with JSON, YAML, `.strings`, `.po`, ARB, Android XML, CSV, XLIFF, `.properties`, `.resx` and Mozilla Fluent for translation; the `check` firewall currently gates JSON and ARB (more formats land next release).
+Both modes read the same 13 formats: JSON, YAML, `.strings`, `.xcstrings`, `.po`, ARB, Android XML, CSV, XLIFF, `.properties`, `.resx`, Mozilla Fluent and Markdown.
 
 ## Usage
 
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: RaiGanja/kaeris-action@v1
+      - uses: kaeris-io/kaeris-action@v1
         with:
           mode: check
           source: locales/en.json
@@ -48,12 +48,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: kaeris
-        uses: RaiGanja/kaeris-action@v1
+        uses: kaeris-io/kaeris-action@v1
         with:
           mode: translate
           source: locales/en.json
           languages: es,fr,de,ja
-          api-key: ${{ secrets.KAERIS_API_KEY }}   # omit for the free anonymous tier
+          api-key: ${{ secrets.KAERIS_API_KEY }}   # omit for the free demo
       - if: steps.kaeris.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
@@ -70,12 +70,13 @@ jobs:
 | `source` | Source strings file, e.g. `locales/en.json` | — (required) |
 | `languages` | Comma-separated target languages, e.g. `es,fr,de,ja` | — (required) |
 | `out` | Directory for translated / target locale files | source's dir |
-| `api-key` | KAERIS API key (Pro/Team). Omit for the free anonymous tier. Unused in `check`. | — |
-| `openrouter-key` | OpenRouter key for Lifetime/BYOK plans. Unused in `check`. | — |
+| `api-key` | KAERIS API key, e.g. the free key from [kaeris.dev/docs/key](https://kaeris.dev/docs/key) (no account). Omit for the free demo. Unused in `check`. | — |
+| `openrouter-key` | OpenRouter key for the Lifetime (BYOK) plan. Unused in `check`. | — |
 | `only-new` | `translate`: only translate keys missing/changed since the last run (uses `kaeris.lock`) | `true` |
-| `tone` | `translate`: `neutral`, `formal`, or `casual` | `neutral` |
+| `tone` | `translate`: `neutral`, `formal`, or `casual` | — (`neutral`) |
 | `icu` | `translate`: hint that strings use ICU MessageFormat (plurals/select) so it's preserved | `false` |
 | `strict` | `check`: also fail on extra/stale keys not in the source | `false` |
+| `sarif-file` | `check`: also write a SARIF 2.1.0 report to this path (see below) | — |
 | `api-url` | API base URL | `https://kaeris.dev` |
 
 ## Outputs
@@ -87,6 +88,7 @@ jobs:
 | `missing` | Total missing-key count across all target languages |
 | `placeholder-issues` | Total placeholder-mismatch count (should be `0`) |
 | `check-exit-code` | Exit code of `kaeris check` (0 clean, 1 problem, 2 bad usage) |
+| `translate-exit-code` | Exit code of `kaeris translate` (0 clean, 3 some languages fell back to the source); non-zero also fails the step |
 
 ## Findings inside the pull request (SARIF)
 
@@ -95,7 +97,7 @@ the exact line of the locale file — in the diff, next to the human reviewer's 
 instead of hiding in the job log.
 
 ```yaml
-- uses: RaiGanja/kaeris-action@v1
+- uses: kaeris-io/kaeris-action@v1
   with:
     mode: check
     source: locales/en.json
@@ -123,7 +125,7 @@ The deterministic checks (no API needed) catch the bugs that actually break apps
 ## Links
 
 - Website & docs: [kaeris.dev](https://kaeris.dev)
-- CLI: `pip install kaeris` ([PyPI](https://pypi.org/project/kaeris/))
+- CLI: `pip install kaeris` ([PyPI](https://pypi.org/project/kaeris/)); the check alone, without Python: `npx kaeris check` ([npm](https://www.npmjs.com/package/kaeris))
 - MCP server (localize from Claude/Cursor): `pip install kaeris-mcp`
 
 ## License
