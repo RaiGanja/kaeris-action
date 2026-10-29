@@ -1,0 +1,8 @@
+{
+  "greeting": "Hello, {name}!",
+  "files_deleted": "{count} files deleted",
+  "checkout": {
+    "title": "Checkout",
+    "pay": "Pay {amount}"
+  }
+}

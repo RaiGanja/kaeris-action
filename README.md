@@ -1,15 +1,33 @@
 <img src="https://kaeris.dev/icon-512.png" alt="KAERIS" width="72" align="left" style="margin-right:16px" />
 
-# KAERIS i18n Translate — GitHub Action
+# KAERIS i18n Check and Translate
 
-Translate new or changed i18n keys with AI, or gate CI on translation completeness — **46 languages, incremental, placeholder-safe.**
+Fail CI when a locale file is missing keys or a translation broke a placeholder. Or translate
+the keys you added into 46 languages and open a pull request with the result.
 
-Two modes:
+[![test](https://github.com/kaeris-io/kaeris-action/actions/workflows/test.yml/badge.svg)](https://github.com/kaeris-io/kaeris-action/actions/workflows/test.yml)
+[![release](https://img.shields.io/github/v/release/kaeris-io/kaeris-action)](https://github.com/kaeris-io/kaeris-action/releases)
+[![license](https://img.shields.io/github/license/kaeris-io/kaeris-action)](LICENSE)
 
-- **`translate`** — translates the keys that are new or changed since the last run and writes the locale files, then emits a `changed` flag and a Markdown `summary` so you can open a PR only when something actually changed.
-- **`check`** — a static, offline **i18n firewall**: no API call, fails the build when a locale is missing keys or a translation broke a placeholder. Free, no key required.
+```yaml
+- uses: kaeris-io/kaeris-action@v2
+  with:
+    mode: check
+    source: locales/en.json
+    languages: de,fr,ja
+```
 
-Both modes read the same 13 formats: JSON, YAML, `.strings`, `.xcstrings`, `.po`, ARB, Android XML, CSV, XLIFF, `.properties`, `.resx`, Mozilla Fluent and Markdown.
+- **`check`**: offline, no API call, no key. Fails the job on a missing key, a lost or renamed
+  placeholder, number drift or a missing plural form. Optional SARIF report puts each finding on
+  the line of the locale file in the pull request.
+- **`translate`**: translates only the keys that are new or changed since the last run, writes
+  the locale files, and returns `changed` and a Markdown `summary` for the pull request body.
+- **13 formats** in both modes: JSON, YAML, `.strings`, `.xcstrings`, `.po`, ARB, Android XML,
+  CSV, XLIFF, `.properties`, `.resx`, Fluent and Markdown.
+
+`check` is free. `translate` runs without a key on the free tier (8 languages per run); plans:
+Pro $19/month with 12M characters, Team/API $79/month with 60M, Lifetime $79 once with your own
+OpenRouter key. See [kaeris.dev/pricing](https://kaeris.dev/pricing.html).
 
 ## Usage
 
@@ -24,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: kaeris-io/kaeris-action@v1
+      - uses: kaeris-io/kaeris-action@v2
         with:
           mode: check
           source: locales/en.json
@@ -48,7 +66,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: kaeris
-        uses: kaeris-io/kaeris-action@v1
+        uses: kaeris-io/kaeris-action@v2
         with:
           mode: translate
           source: locales/en.json
@@ -97,7 +115,7 @@ the exact line of the locale file — in the diff, next to the human reviewer's 
 instead of hiding in the job log.
 
 ```yaml
-- uses: kaeris-io/kaeris-action@v1
+- uses: kaeris-io/kaeris-action@v2
   with:
     mode: check
     source: locales/en.json
@@ -122,11 +140,18 @@ job fails and the log lists every finding — you just do not get the inline ann
 
 The deterministic checks (no API needed) catch the bugs that actually break apps: lost or renamed placeholders, number drift (`Delete 5 files` → `Delete 50 files`), the ICU/CLDR plural categories a target language requires, and UI-overflow risk. Every number in the PR summary comes from a real `kaeris check --json` run — nothing is fabricated.
 
+## Upgrading from v1
+
+Change `@v1` to `@v2`. Inputs and outputs are the same. v2 installs `kaeris>=0.2.39`
+(v1 installs `>=0.2.12`), and the Marketplace name is now "KAERIS i18n Check and Translate".
+The `v1` tag stays where it is.
+
 ## Links
 
-- Website & docs: [kaeris.dev](https://kaeris.dev)
+- Website and docs: [kaeris.dev](https://kaeris.dev), [GitHub Actions recipe](https://kaeris.dev/ci-github-actions.html)
 - CLI: `pip install kaeris` ([PyPI](https://pypi.org/project/kaeris/)); the check alone, without Python: `npx kaeris check` ([npm](https://www.npmjs.com/package/kaeris))
-- MCP server (localize from Claude/Cursor): `pip install kaeris-mcp`
+- MCP server for Claude, Cursor and other MCP clients: `pip install kaeris-mcp`
+- Questions and ideas: [Discussions](https://github.com/kaeris-io/kaeris-cli/discussions). Security: [SECURITY.md](SECURITY.md)
 
 ## License
 

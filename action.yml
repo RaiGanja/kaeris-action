@@ -1,8 +1,8 @@
-name: "KAERIS i18n Translate"
-description: "Translate new/changed i18n keys with AI, or gate CI on translation completeness — 46 languages, incremental, placeholder-safe."
+name: "KAERIS i18n Check and Translate"
+description: "Fail CI on missing keys or broken placeholders in locale files, or translate new keys into 46 languages. 13 formats."
 branding:
-  icon: globe
-  color: purple
+  icon: check-circle
+  color: gray-dark
 
 inputs:
   mode:
@@ -89,8 +89,9 @@ runs:
       # Pin to the version that ships every flag this action passes — the `check --json --ci`
       # firewall, the incremental flags, and `--sarif`. Unpinned, a runner can be handed an
       # older CLI that lacks one and the job dies on "unrecognized arguments": that is exactly
-      # how the SARIF gap showed up by hand on 03.08.2026.
-      run: pip install "kaeris>=0.2.12"
+      # how the SARIF gap showed up by hand on 03.08.2026. v2 starts from 0.2.39, the release
+      # current when v2 was cut.
+      run: pip install "kaeris>=0.2.39"
 
     - name: Run KAERIS (${{ inputs.mode }})
       id: run

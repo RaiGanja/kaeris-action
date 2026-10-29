@@ -1,0 +1,8 @@
+{
+  "greeting": "Hallo, {name}!",
+  "files_deleted": "{count} Dateien gelöscht",
+  "checkout": {
+    "title": "Kasse",
+    "pay": "{amount} bezahlen"
+  }
+}

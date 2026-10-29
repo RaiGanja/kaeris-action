@@ -1,0 +1,8 @@
+{
+  "greeting": "Bonjour, {name} !",
+  "files_deleted": "{count} fichiers supprimés",
+  "checkout": {
+    "title": "Paiement",
+    "pay": "Payer {amount}"
+  }
+}
